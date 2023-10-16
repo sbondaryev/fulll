@@ -43,7 +43,7 @@ export class RegisterVehicleCLI extends CommandRunner {
       new RegisterVehicleCommand(vehicle.id, fleetId),
     );
 
-    console.log(fleet);
+    console.log(vehicle);
   }
 }
 

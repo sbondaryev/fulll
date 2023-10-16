@@ -28,8 +28,8 @@ $ npx ts-node src/main.ts create 1
 Fleet { id: 50, userId: 1, vehicles: [] }
 
 $ npx ts-node src/main.ts register-vehicle 50 H1-6900-H2
-Fleet { id: 50, userId: 1, vehicles: [ 61 ] }
+Vehicle { id: 22, plateNumber: 'H1-6900-H2' }
 
 $ npx ts-node src/main.ts localize-vehicle 50 H1-6900-H2 1234 5678
-Vehicle { id: 61, plateNumber: 'H1-6900-H2', parkedLocationId: 38 }
+Location { id: 3, latitude: 1234, longitude: 5678 }
 ```

@@ -5,10 +5,8 @@ import { Vehicle } from '../domain/vehicle.model';
 const toModel = (item) => {
   if (!item) return undefined;
 
-  const { id, plateNumber, parkedLocationId } = item;
-  const vehicle = new Vehicle(plateNumber, id);
-  vehicle.parkedLocationId = parkedLocationId;
-  return vehicle;
+  const { id, plateNumber } = item;
+  return new Vehicle(plateNumber, id);
 };
 
 @Injectable()
@@ -41,11 +39,9 @@ export class VehicleRepository {
         plateNumber: newVehicle.plateNumber,
       },
       update: {
-        parkedLocationId: newVehicle.parkedLocationId,
         plateNumber: newVehicle.plateNumber,
       },
       create: {
-        parkedLocationId: newVehicle.parkedLocationId,
         plateNumber: newVehicle.plateNumber,
       },
     });

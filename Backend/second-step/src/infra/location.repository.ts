@@ -5,10 +5,8 @@ import { Location } from '../domain/location.model';
 const toModel = (item) => {
   if (!item) return undefined;
 
-  const { id, latitude, longitude, placedVehicleId } = item;
-  const location = new Location(latitude, longitude, id);
-  placedVehicleId && location.hold(placedVehicleId);
-  return location;
+  const { id, latitude, longitude } = item;
+  return new Location(latitude, longitude, id);
 };
 
 @Injectable()
@@ -50,12 +48,12 @@ export class LocationRepository {
         },
       },
       update: {
-        placedVehicleId: newLocation.placedVehicleId,
+        latitude: newLocation.latitude,
+        longitude: newLocation.longitude,
       },
       create: {
         latitude: newLocation.latitude,
         longitude: newLocation.longitude,
-        placedVehicleId: newLocation.placedVehicleId,
       },
     });
 
