@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { Vehicle } from '../../domain/vehicle.model';
-import { vehicleRepository } from '../../infra/vehicle.repository';
+import { VehicleRepository } from '../../infra/vehicle.repository';
 
 export class CreateVehicleCommand {
   constructor(public readonly plateNumber: string) {}
@@ -10,7 +10,9 @@ export class CreateVehicleCommand {
 export class CreateVehicleHandler
   implements ICommandHandler<CreateVehicleCommand>
 {
+  constructor(private vehicleRepository: VehicleRepository) {}
+
   execute(payload: CreateVehicleCommand) {
-    return vehicleRepository.upsert(new Vehicle(payload.plateNumber));
+    return this.vehicleRepository.upsert(new Vehicle(payload.plateNumber));
   }
 }

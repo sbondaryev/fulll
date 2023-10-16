@@ -1,3 +1,4 @@
+import { Injectable } from '@nestjs/common';
 import prisma from './prismaClient';
 import { Vehicle } from '../domain/vehicle.model';
 
@@ -10,7 +11,8 @@ const toModel = (item) => {
   return vehicle;
 };
 
-class VehicleRepository {
+@Injectable()
+export class VehicleRepository {
   async findOneById(id: number): Promise<Vehicle> {
     const vehicle = await prisma.vehicle.findUnique({
       where: {
@@ -58,5 +60,3 @@ class VehicleRepository {
     return (await vehicles).map(toModel);
   }
 }
-
-export const vehicleRepository = new VehicleRepository();

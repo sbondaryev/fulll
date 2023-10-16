@@ -1,3 +1,4 @@
+import { Injectable } from '@nestjs/common';
 import prisma from './prismaClient';
 import { Fleet } from '../domain/fleet.model';
 
@@ -11,7 +12,8 @@ const toModel = (item) => {
   return fleet;
 };
 
-class FleetRepository {
+@Injectable()
+export class FleetRepository {
   async findOneById(id: number): Promise<Fleet> {
     const fleet = await prisma.fleet.findUnique({
       where: {
@@ -48,5 +50,3 @@ class FleetRepository {
     return (await fleets).map(toModel);
   }
 }
-
-export const fleetRepository = new FleetRepository();

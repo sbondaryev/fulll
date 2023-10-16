@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { Location } from '../../domain/location.model';
-import { locationRepository } from '../../infra/location.repository';
+import { LocationRepository } from '../../infra/location.repository';
 
 export class CreateLocationCommand {
   constructor(
@@ -13,8 +13,10 @@ export class CreateLocationCommand {
 export class CreateLocationHandler
   implements ICommandHandler<CreateLocationCommand>
 {
+  constructor(private locationRepository: LocationRepository) {}
+
   execute(payload: CreateLocationCommand) {
-    return locationRepository.upsert(
+    return this.locationRepository.upsert(
       new Location(payload.latitude, payload.longitude),
     );
   }

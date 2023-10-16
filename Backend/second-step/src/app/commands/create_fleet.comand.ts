@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { Fleet } from '../../domain/fleet.model';
-import { fleetRepository } from '../../infra/fleet.repository';
+import { FleetRepository } from '../../infra/fleet.repository';
 
 export class CreateFleetCommand {
   constructor(public readonly userId: number) {}
@@ -8,7 +8,9 @@ export class CreateFleetCommand {
 
 @CommandHandler(CreateFleetCommand)
 export class CreateFleetHandler implements ICommandHandler<CreateFleetCommand> {
+  constructor(private fleetRepository: FleetRepository) {}
+
   execute(payload: CreateFleetCommand) {
-    return fleetRepository.upsert(new Fleet(payload.userId));
+    return this.fleetRepository.upsert(new Fleet(payload.userId));
   }
 }

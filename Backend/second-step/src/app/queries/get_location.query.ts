@@ -1,5 +1,5 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { locationRepository } from '../../infra/location.repository';
+import { LocationRepository } from '../../infra/location.repository';
 
 export class GetLocationQuery {
   constructor(public readonly locationId: number) {}
@@ -7,7 +7,9 @@ export class GetLocationQuery {
 
 @QueryHandler(GetLocationQuery)
 export class GetLocationHandler implements IQueryHandler<GetLocationQuery> {
+  constructor(private locationRepository: LocationRepository) {}
+
   async execute(payload: GetLocationQuery) {
-    return await locationRepository.findOneById(payload.locationId);
+    return await this.locationRepository.findOneById(payload.locationId);
   }
 }

@@ -1,5 +1,5 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { fleetRepository } from '../../infra/fleet.repository';
+import { FleetRepository } from '../../infra/fleet.repository';
 
 export class GetFleetQuery {
   constructor(public readonly fleetId: number) {}
@@ -7,7 +7,9 @@ export class GetFleetQuery {
 
 @QueryHandler(GetFleetQuery)
 export class GetFleetHandler implements IQueryHandler<GetFleetQuery> {
+  constructor(private fleetRepository: FleetRepository) {}
+
   execute(payload: GetFleetQuery) {
-    return fleetRepository.findOneById(payload.fleetId);
+    return this.fleetRepository.findOneById(payload.fleetId);
   }
 }

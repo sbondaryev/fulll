@@ -7,10 +7,12 @@ import {
 } from './app.command';
 import { CommandHandlers } from './app/commands';
 import { QueryHandlers } from './app/queries';
+import { Repositories } from './infra';
 
 @Module({
   imports: [CqrsModule],
   providers: [
+    ...Repositories,
     ...CommandHandlers,
     ...QueryHandlers,
     CreateFleetCLI,

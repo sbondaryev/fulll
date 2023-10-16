@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { fleetRepository } from '../../infra/fleet.repository';
+import { FleetRepository } from '../../infra/fleet.repository';
 
 export class RegisterVehicleCommand {
   constructor(
@@ -12,14 +12,16 @@ export class RegisterVehicleCommand {
 export class RegisterVehicleHandler
   implements ICommandHandler<RegisterVehicleCommand>
 {
+  constructor(private fleetRepository: FleetRepository) {}
+
   async execute(payload: RegisterVehicleCommand) {
-    const fleet = await fleetRepository.findOneById(payload.fleetId);
+    const fleet = await this.fleetRepository.findOneById(payload.fleetId);
     if (!fleet) {
       throw Error('Fleet not found.');
     }
 
     fleet.addRegistration(payload.vehicleId);
-    await fleetRepository.upsert(fleet);
+    await this.fleetRepository.upsert(fleet);
     return fleet;
   }
 }

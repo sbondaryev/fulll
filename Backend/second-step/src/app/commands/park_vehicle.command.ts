@@ -1,7 +1,8 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { locationRepository } from '../../infra/location.repository';
-import { vehicleRepository } from '../../infra/vehicle.repository';
+import { LocationRepository } from '../../infra/location.repository';
+import { VehicleRepository } from '../../infra/vehicle.repository';
 import { Location } from '../../domain/location.model';
+import { Vehicle } from '../../domain/vehicle.model';
 
 export class ParkVehicleCommand {
   constructor(
@@ -13,10 +14,15 @@ export class ParkVehicleCommand {
 
 @CommandHandler(ParkVehicleCommand)
 export class ParkVehicleHandler implements ICommandHandler<ParkVehicleCommand> {
+  constructor(
+    private locationRepository: LocationRepository,
+    private vehicleRepository: VehicleRepository,
+  ) {}
+
   async execute(payload: ParkVehicleCommand) {
     const [vehicle, location] = await Promise.all([
-      vehicleRepository.findOneByPlateNumber(payload.plateNumber),
-      locationRepository.findOneByCoordinates(
+      this.vehicleRepository.findOneByPlateNumber(payload.plateNumber),
+      this.locationRepository.findOneByCoordinates(
         payload.latitude,
         payload.longitude,
       ),
@@ -26,7 +32,30 @@ export class ParkVehicleHandler implements ICommandHandler<ParkVehicleCommand> {
     }
 
     return location
-      ? vehicle.park(location)
-      : vehicle.park(new Location(payload.latitude, payload.longitude));
+      ? this.park(vehicle, location)
+      : this.park(vehicle, new Location(payload.latitude, payload.longitude));
+  }
+
+  async park(vehicle: Vehicle, newLocation: Location) {
+    if (newLocation.isHold()) {
+      throw Error('A vehicle is already parked at this location.');
+    }
+
+    // Free old location if holded
+    if (vehicle.parkedLocationId) {
+      const oldLocation = await this.locationRepository.findOneById(
+        vehicle.parkedLocationId,
+      );
+      oldLocation.free();
+      await this.locationRepository.upsert(oldLocation);
+    }
+
+    // Hold new location
+    newLocation.hold(vehicle.id);
+    const persistedNewLocation =
+      await this.locationRepository.upsert(newLocation);
+
+    vehicle.parkedLocationId = persistedNewLocation.id;
+    return this.vehicleRepository.upsert(vehicle);
   }
 }
