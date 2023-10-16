@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <title>FizzBuzz</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://unpkg.com/chota@latest">
+  <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    #app {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .control {
+      display: flex;
+      align-items: baseline;
+      margin-top: 2em;
+    }
+
+    .numbers {
+      margin-top: 2em;
+    }
+
+    .number {
+      display: inline-block;
+      min-width: 2em;
+      text-align: center;
+      border: 1px solid gray;
+      margin: 0.1em;
+      padding: 0.2em 0.3em;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <h1>FizzBuzz</h1>
+    <section class="row control">
+      <p>Sequence Length :</p>
+      <input class="col" type="number" v-model="numbersCount" placeholder="30">
+      <button class="col button primary" @click="handleRegenerate">Regenerate</button>
+    </section>
+    <section class="numbers">
+      <div class="number" v-for="(number, lineIndex) in numbers">
+        {{number}}
+      </div>
+    </section>
+  </div>
+
+  <script>
+    //== { FizzBuzz Algorithm } ===========================
+    const generateNumbers = (end) => _.range(1, end + 1)
+
+    const fizzBuzz = (numbers) => _.map(numbers, number => {
+      switch (true) {
+        case number % 3 == 0 && number % 5 == 0: return "FizzBuzz"
+        case number % 3 == 0: return "Fizz"
+        case number % 5 == 0: return "Buzz"
+        default: return number
+      }
+    })
+
+    //== { Vue Routines }==================================
+    const { createApp, ref, watch } = Vue
+    const numbersCount = ref(30)
+    const numbers = ref(fizzBuzz(generateNumbers(numbersCount.value)))
+
+    const handleRegenerate = () => {
+      numbers.value = fizzBuzz(generateNumbers(numbersCount.value))
+    }
+
+    createApp({
+      data() {
+        return {
+          numbersCount,
+          numbers,
+          handleRegenerate
+        }
+      }
+    }).mount('#app')
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <title>FizzBuzz - advanced</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://unpkg.com/chota@latest">
+  <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    #app {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .control {
+      display: flex;
+      align-items: baseline;
+      margin-top: 2em;
+    }
+
+    .numbers {
+      margin-top: 2em;
+    }
+
+    .number {
+      display: inline-block;
+      min-width: 2em;
+      text-align: center;
+      border: 1px solid gray;
+      margin: 0.1em;
+      padding: 0.2em 0.3em;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <h1>FizzBuzz - With Rules</h1>
+    <section class="rules">
+      <div class="row">
+        <input class="col" type="text" v-model="newRule.assert" placeholder="number%2==0" />
+        <input class="col" type="text" v-model="newRule.value" placeholder="Rizz" />
+        <button class="col button" @click="handleAddRule">Add Rule</button>
+      </div>
+      <fieldset>
+        <legend>Rules</legend>
+        <div class="row" v-for="(rule, index) in numberRules">
+          <input class="col" type="text" v-model="rule.assert" />
+          <input class="col" type="text" v-model="rule.value" />
+          <button class="col button clear" @click="handleDeleteRule(index)">
+            <img src="https://icongr.am/fontawesome/trash.svg?size=20&color=777777" alt="delete" />
+          </button>
+        </div>
+      </fieldset>
+    </section>
+    <section class="row control">
+      <p>Sequence Length :</p>
+      <input class="col" type="number" v-model="numbersCount" placeholder="30">
+      <button class="col button primary" @click="handleRegenerate">Regenerate</button>
+    </section>
+    <section class="numbers">
+      <span class="number" v-for="(number, lineIndex) in numbers">
+        {{number}}
+      </span>
+    </section>
+  </div>
+
+  <script>
+    //== { FizzBuzz Algorithm } ===========================
+    const generateNumbers = (end) => _.range(1, end + 1)
+
+    const applyRules = (number, rules) => {
+      const appliedRules = _.reduce(
+        rules,
+        (result, rule) => eval('number => ' + _.get(rule, 'assert'))(number)
+          ? result + _.get(rule, 'value')
+          : result
+        , '')
+      return !_.isEmpty(appliedRules) ? appliedRules : number
+    }
+
+    const fizzBuzz = (numbers, rules) => {
+      return _.map(numbers, number => applyRules(number, rules))
+    }
+
+    //== { Vue Routines }==================================
+    const { createApp, ref, watch } = Vue
+
+    const numberRules = ref([
+      { assert: 'number%3==0', value: "Fizz" },
+      { assert: 'number%5==0', value: "Buzz" }
+    ])
+    const newRule = ref({})
+    const numbersCount = ref(30)
+
+    const generateSequence = () => fizzBuzz(generateNumbers(numbersCount.value), numberRules.value)
+
+    const numbers = ref(generateSequence())
+
+    watch(numberRules, () => {
+      numbers.value = generateSequence()
+    })
+
+    handleRegenerate = () => {
+      numbers.value = generateSequence()
+    }
+
+    handleDeleteRule = (index) => {
+      numberRules.value = _.filter(numberRules.value, (value, key) => key !== index)
+    }
+
+    handleAddRule = (index) => {
+      numberRules.value = [newRule.value, ...numberRules.value]
+      newRule.value = {}
+    }
+
+    createApp({
+      data() {
+        return {
+          numbersCount,
+          numbers,
+          numberRules,
+          newRule,
+          handleRegenerate,
+          handleDeleteRule,
+          handleAddRule,
+        }
+      }
+    }).mount('#app')
+  </script>
+</body>
+
+</html>
